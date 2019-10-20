@@ -1,3 +1,21 @@
+# How to use docker as local development environment
+
+Clone forks of aet and aet-docker repositories so the folder structure looks like that:
+```
+aet-sds
+│
+└───aet
+│
+└───aet-docker
+```
+
+From aet repository run `mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V` in order to build all needed artifacts.
+
+Go to `aet-docker`, open the `copy_artifacts.sh`, adjust AET_REPO_PATH and AET_DOCKER_REPO_PATH variables, and run the script.
+
+Now, if you haven't started the app yet, run `docker swarm init` and `docker stack deploy -c aet-swarm.yml aet` from `aet-docker/example-aet-swarm` direstory.
+`docker swarm leave --force` lets you kill all the containers if you need to force the restart of the whole stack.
+
 # AET Docker
 <p align="center">
   <img src="https://raw.githubusercontent.com/Skejven/aet-docker/master/misc/aet-docker.png" alt="AET Docker Logo"/>
