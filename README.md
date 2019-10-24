@@ -4,17 +4,29 @@ Clone forks of aet and aet-docker repositories so the folder structure looks lik
 ```
 aet-sds
 │
+└───misc
+│
 └───aet
 │
 └───aet-docker
+  │
+  └───configs
+  │
+  └───bundles
+  │
+  └───features
+  │
+  └───report
 ```
+Read more about directory structure [here](#developer-environment)
 
 From aet repository run `mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V` in order to build all needed artifacts.
 
-Go to `aet-docker`, open the `copy_artifacts.sh`, adjust AET_REPO_PATH and AET_DOCKER_REPO_PATH variables, and run the script.
+Go to `aet-docker`, open the `copy_artifacts.sh`, adjust AET_REPO_PATH and AET_DOCKER_REPO_PATH variables (you can provide them as arguments from the command line), and run the script.
 
 Now, if you haven't started the app yet, run `docker swarm init` and `docker stack deploy -c aet-swarm.yml aet` from `aet-docker/example-aet-swarm` direstory.
 `docker swarm leave --force` lets you kill all the containers if you need to force the restart of the whole stack.
+
 
 # AET Docker
 <p align="center">
