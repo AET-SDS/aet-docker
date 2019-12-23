@@ -19,7 +19,7 @@
 
 AET_DOCKER_VERSION="$1"
 
-docker build -t philbug/aet_activemq:${AET_DOCKER_VERSION} activemq/
-docker build -t philbug/aet_browsermob:${AET_DOCKER_VERSION} browsermob/
-docker build -t philbug/aet_karaf:${AET_DOCKER_VERSION} karaf/
+docker build -t philbug/aet_activemq:${AET_DOCKER_VERSION} activemq/     && \
+docker build -t philbug/aet_browsermob:${AET_DOCKER_VERSION} browsermob/ && \
+docker build -t philbug/aet_karaf:${AET_DOCKER_VERSION} karaf/           && \
 docker build -t philbug/aet_report:${AET_DOCKER_VERSION} report/
