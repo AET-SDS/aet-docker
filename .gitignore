@@ -1,3 +1,6 @@
+./report/aet-artifacts
+./karaf/aet-artifacts
+./aet-artifacts
 # Custom file that may be added for additional maven build properties.
 # For properties-maven-plugin configuration.
 # Add this file or override maven property for it's location.

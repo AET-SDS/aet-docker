@@ -24,7 +24,7 @@ LABEL maintainers="Jan Helak <https://github.com/heljan>, Maciej Laskowski <skej
 ARG AET_VERSION="3.3.0"
 ARG AET_ARTIFACT="report.zip"
 ARG AET_ARTIFACT_DOWNLOAD_URL="https://github.com/Cognifide/aet/releases/download/${AET_VERSION}/${AET_ARTIFACT}"
-ARG AET_ARTIFACT_LOCATION="/tmp/aet-artifacts/${AET_ARTIFACT}"
+ARG AET_ARTIFACT_LOCATION="./aet-artifacts/${AET_ARTIFACT}"
 
 # set the env params
 ENV APACHE_USER         www-data
@@ -49,7 +49,10 @@ COPY aet.conf ${APACHE_CONFIG_DIR}/aet.conf
 RUN echo "Include conf/aet.conf" >> ${APACHE_CONFIG_DIR}/httpd.conf
 
 # download and deploy AET reports app
-RUN unzip -o ${AET_ARTIFACT_LOCATION} -d ${APACHE_WWW_DIR}
+RUN mkdir -p ./aet-artifacts
+COPY ./aet-artifacts ./aet-artifacts
+RUN unzip -o ${AET_ARTIFACT_LOCATION} -d ${APACHE_WWW_DIR} && \
+    rm -rf ./aet-artifacts
 # Add all extra files
 COPY extra ${APACHE_WWW_DIR}
 

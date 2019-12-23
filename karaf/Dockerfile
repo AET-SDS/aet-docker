@@ -32,7 +32,7 @@ ARG KARAF_DOWNLOAD_URL="http://archive.apache.org/dist/karaf/${KARAF_VERSION}/ap
 ARG AET_VERSION="3.3.0"
 ARG AET_ARTIFACT="features.zip"
 ARG AET_ARTIFACT_DOWNLOAD_URL="https://github.com/Cognifide/aet/releases/download/${AET_VERSION}/${AET_ARTIFACT}"
-ARG AET_ARTIFACT_LOCATION="/tmp/aet-artifacts/${AET_ARTIFACT}"
+ARG AET_ARTIFACT_LOCATION="./aet-artifacts/features.zip"
 
 RUN apk add --update bash tar jq curl && rm -rf /var/cache/apk/*
 
@@ -45,6 +45,8 @@ RUN curl -fSL -o /tmp/apache-karaf.tar.gz ${KARAF_DOWNLOAD_URL} \
   && echo org.ops4j.pax.url.mvn.defaultRepositories = file:///opt/maven/repository@id=local.app@snapshots  >> /opt/karaf/etc/org.ops4j.pax.url.mvn.cfg
 
 # download and unzip AET features
+RUN mkdir -p ./aet-artifacts
+COPY ./aet-artifacts ./aet-artifacts
 RUN unzip -o ${AET_ARTIFACT_LOCATION} -d /opt/karaf/deploy
 
 # Run karaf and wait until it downloads all features
@@ -67,7 +69,7 @@ ENV KARAF_EXEC exec
 ARG AET_VERSION="3.3.0"
 ARG AET_ARTIFACT="bundles.zip"
 ARG AET_ARTIFACT_DOWNLOAD_URL="https://github.com/Cognifide/aet/releases/download/${AET_VERSION}/${AET_ARTIFACT}"
-ARG AET_ARTIFACT_LOCATION="/tmp/aet-artifacts/${AET_ARTIFACT}"
+ARG AET_ARTIFACT_LOCATION="./aet-artifacts/${AET_ARTIFACT}"
 
 RUN addgroup -S -g ${KARAF_UID} ${KARAF_USER}; \
   adduser -S -u ${KARAF_UID} -g ${KARAF_USER} ${KARAF_USER}
@@ -86,8 +88,11 @@ RUN mkdir -p /aet/bundles /aet/configs /aet/features \
   && chown -R ${KARAF_USER}.${KARAF_USER} /aet
 
 # Download and unzip AET bundles
+RUN mkdir -p ./aet-artifacts
+COPY ./aet-artifacts ./aet-artifacts
 RUN unzip -o ${AET_ARTIFACT_LOCATION} -d /aet/bundles \
-  && chown -R ${KARAF_USER}.${KARAF_USER} /aet/bundles
+  && chown -R ${KARAF_USER}.${KARAF_USER} /aet/bundles \
+  && rm -rf ./aet-artifacts
 
 # Add all extra bundles
 COPY extra /aet/bundles
