@@ -32,20 +32,20 @@ ARG KARAF_DOWNLOAD_URL="http://archive.apache.org/dist/karaf/${KARAF_VERSION}/ap
 ARG AET_VERSION="3.3.0"
 ARG AET_ARTIFACT="features.zip"
 ARG AET_ARTIFACT_DOWNLOAD_URL="https://github.com/Cognifide/aet/releases/download/${AET_VERSION}/${AET_ARTIFACT}"
+ARG AET_ARTIFACT_LOCATION="/tmp/aet-artifacts/${AET_ARTIFACT}"
 
 RUN apk add --update bash tar jq curl && rm -rf /var/cache/apk/*
 
 RUN curl -fSL -o /tmp/apache-karaf.tar.gz ${KARAF_DOWNLOAD_URL} \
-    && echo "${KARAF_DOWNLOAD_SHA512}  /tmp/apache-karaf.tar.gz" | sha512sum -c - \
-    && mkdir -p /opt/karaf \
-    && tar --strip-components=1 -C /opt/karaf -xzf /tmp/apache-karaf.tar.gz \
-    && rm /tmp/apache-karaf.tar.gz \
-    && mkdir -p /opt/karaf/data /opt/karaf/data/log \
-    && echo org.ops4j.pax.url.mvn.defaultRepositories = file:///opt/maven/repository@id=local.app@snapshots  >> /opt/karaf/etc/org.ops4j.pax.url.mvn.cfg
+  && echo "${KARAF_DOWNLOAD_SHA512}  /tmp/apache-karaf.tar.gz" | sha512sum -c - \
+  && mkdir -p /opt/karaf \
+  && tar --strip-components=1 -C /opt/karaf -xzf /tmp/apache-karaf.tar.gz \
+  && rm /tmp/apache-karaf.tar.gz \
+  && mkdir -p /opt/karaf/data /opt/karaf/data/log \
+  && echo org.ops4j.pax.url.mvn.defaultRepositories = file:///opt/maven/repository@id=local.app@snapshots  >> /opt/karaf/etc/org.ops4j.pax.url.mvn.cfg
 
 # download and unzip AET features
-RUN curl -fSL -o /tmp/${AET_ARTIFACT} ${AET_ARTIFACT_DOWNLOAD_URL} \
-  && unzip -o /tmp/${AET_ARTIFACT} -d /opt/karaf/deploy && rm /tmp/${AET_ARTIFACT}
+RUN unzip -o ${AET_ARTIFACT_LOCATION} -d /opt/karaf/deploy
 
 # Run karaf and wait until it downloads all features
 COPY provision-karaf.sh /tmp/provision-karaf.sh
@@ -67,11 +67,12 @@ ENV KARAF_EXEC exec
 ARG AET_VERSION="3.3.0"
 ARG AET_ARTIFACT="bundles.zip"
 ARG AET_ARTIFACT_DOWNLOAD_URL="https://github.com/Cognifide/aet/releases/download/${AET_VERSION}/${AET_ARTIFACT}"
+ARG AET_ARTIFACT_LOCATION="/tmp/aet-artifacts/${AET_ARTIFACT}"
 
 RUN addgroup -S -g ${KARAF_UID} ${KARAF_USER}; \
-    adduser -S -u ${KARAF_UID} -g ${KARAF_USER} ${KARAF_USER}
+  adduser -S -u ${KARAF_UID} -g ${KARAF_USER} ${KARAF_USER}
 
-RUN apk add --update bash curl tar && rm -rf /var/cache/apk/*
+RUN apk add --update bash jq curl tar && rm -rf /var/cache/apk/*
 
 COPY --from=build /opt/karaf /opt/karaf
 
@@ -85,8 +86,7 @@ RUN mkdir -p /aet/bundles /aet/configs /aet/features \
   && chown -R ${KARAF_USER}.${KARAF_USER} /aet
 
 # Download and unzip AET bundles
-RUN curl -fSL -o /tmp/${AET_ARTIFACT} ${AET_ARTIFACT_DOWNLOAD_URL} \
-  && unzip -o /tmp/${AET_ARTIFACT} -d /aet/bundles && rm /tmp/${AET_ARTIFACT} \
+RUN unzip -o ${AET_ARTIFACT_LOCATION} -d /aet/bundles \
   && chown -R ${KARAF_USER}.${KARAF_USER} /aet/bundles
 
 # Add all extra bundles
@@ -97,7 +97,7 @@ RUN mv /opt/karaf/deploy/aet-*.xml /aet/features \
   && chown -R ${KARAF_USER}.${KARAF_USER} /aet/features
 
 RUN chown -R ${KARAF_USER}.${KARAF_USER} /opt/karaf \
-    && echo org.ops4j.pax.url.mvn.defaultRepositories = file:///opt/maven/repository@id=local.app@snapshots  >> /opt/karaf/etc/org.ops4j.pax.url.mvn.cfg
+  && echo org.ops4j.pax.url.mvn.defaultRepositories = file:///opt/maven/repository@id=local.app@snapshots  >> /opt/karaf/etc/org.ops4j.pax.url.mvn.cfg
 
 EXPOSE 1099 8101 8181 44444
 
