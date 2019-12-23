@@ -44,7 +44,12 @@ do
   else
     status_code=$(get_status_code)
     echo "Karaf loading from $sec sec... response: $status_code";
-    if [ "$status_code" -eq 200 ]
+    if get_bundles_status | grep -i "all"; then
+      echo "All bundles active!"
+      sleep 10;
+      get_bundles_status;
+      exit 0;
+    elif [ "$status_code" -eq 200 ]
     then
       get_bundles_status
     fi;
