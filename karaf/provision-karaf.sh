@@ -33,7 +33,7 @@ echo "Start waiting for Karaf to load features - up to 200 seconds, waiting for 
 
 for i in $(seq 0 60);
 do
-  sec=$((5 * $i))
+  sec=$((5 * i))
   if curl -v -s ${KARAF_URL} 2>&1 | grep -Fq "187 bundles active";
   then
     echo "Karaf loading finished after $sec seconds";
@@ -47,6 +47,10 @@ do
     if get_bundles_status | grep -i "all"; then
       echo "All bundles active!"
       sleep 10;
+      /opt/karaf/bin/karaf stop
+      sleep 10;
+      echo "Status: $(/opt/karaf/bin/karaf status)"
+      exit 0;
       get_bundles_status;
       exit 0;
     elif [ "$status_code" -eq 200 ]
