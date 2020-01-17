@@ -41,11 +41,12 @@ RUN curl -fSL -o /tmp/apache-karaf.tar.gz ${KARAF_DOWNLOAD_URL} \
     && tar --strip-components=1 -C /opt/karaf -xzf /tmp/apache-karaf.tar.gz \
     && rm /tmp/apache-karaf.tar.gz \
     && mkdir -p /opt/karaf/data /opt/karaf/data/log \
-    && echo org.ops4j.pax.url.mvn.defaultRepositories = file:///opt/maven/repository@id=local.app@snapshots  >> /opt/karaf/etc/org.ops4j.pax.url.mvn.cfg
-
+    && echo org.ops4j.pax.url.mvn.defaultRepositories = file:///opt/maven/repository@id=local.app@snapshots  >> /opt/karaf/etc/org.ops4j.pax.url.mvn.cfg \
+    && sed -i "s+http://+https://+g" /opt/karaf/etc/org.ops4j.pax.url.mvn.cfg
 # download and unzip AET features
-RUN curl -fSL -o /tmp/${AET_ARTIFACT} ${AET_ARTIFACT_DOWNLOAD_URL} \
-  && unzip -o /tmp/${AET_ARTIFACT} -d /opt/karaf/deploy && rm /tmp/${AET_ARTIFACT}
+# RUN curl -fSL -o /tmp/${AET_ARTIFACT} ${AET_ARTIFACT_DOWNLOAD_URL}
+COPY --chown=8181:8181 features.zip /tmp/${AET_ARTIFACT}
+RUN unzip -o /tmp/${AET_ARTIFACT} -d /opt/karaf/deploy && rm /tmp/${AET_ARTIFACT}
 
 # Run karaf and wait until it downloads all features
 COPY provision-karaf.sh /tmp/provision-karaf.sh
@@ -84,9 +85,10 @@ COPY etc/org.apache.felix.fileinstall-features.cfg /opt/karaf/etc/org.apache.fel
 RUN mkdir -p /aet/bundles /aet/configs /aet/features \
   && chown -R ${KARAF_USER}.${KARAF_USER} /aet
 
+COPY --chown=8181:8181 bundles.zip /tmp/${AET_ARTIFACT}
 # Download and unzip AET bundles
-RUN curl -fSL -o /tmp/${AET_ARTIFACT} ${AET_ARTIFACT_DOWNLOAD_URL} \
-  && unzip -o /tmp/${AET_ARTIFACT} -d /aet/bundles && rm /tmp/${AET_ARTIFACT} \
+# RUN curl -fSL -o /tmp/${AET_ARTIFACT} ${AET_ARTIFACT_DOWNLOAD_URL} \
+RUN unzip -o /tmp/${AET_ARTIFACT} -d /aet/bundles && rm /tmp/${AET_ARTIFACT} \
   && chown -R ${KARAF_USER}.${KARAF_USER} /aet/bundles
 
 # Add all extra bundles
@@ -97,8 +99,8 @@ RUN mv /opt/karaf/deploy/aet-*.xml /aet/features \
   && chown -R ${KARAF_USER}.${KARAF_USER} /aet/features
 
 RUN chown -R ${KARAF_USER}.${KARAF_USER} /opt/karaf \
-    && echo org.ops4j.pax.url.mvn.defaultRepositories = file:///opt/maven/repository@id=local.app@snapshots  >> /opt/karaf/etc/org.ops4j.pax.url.mvn.cfg
-
+    && echo org.ops4j.pax.url.mvn.defaultRepositories = file:///opt/maven/repository@id=local.app@snapshots  >> /opt/karaf/etc/org.ops4j.pax.url.mvn.cfg \
+    && sed -i "s+http://+https://+g" /opt/karaf/etc/org.ops4j.pax.url.mvn.cfg
 EXPOSE 1099 8101 8181 44444
 
 USER ${KARAF_USER}

@@ -48,8 +48,9 @@ COPY aet.conf ${APACHE_CONFIG_DIR}/aet.conf
 RUN echo "Include conf/aet.conf" >> ${APACHE_CONFIG_DIR}/httpd.conf
 
 # download and deploy AET reports app
-RUN wget -O /tmp/${AET_ARTIFACT} ${AET_ARTIFACT_DOWNLOAD_URL} \
-  && unzip -o /tmp/${AET_ARTIFACT} -d ${APACHE_WWW_DIR} \
+COPY --chown=${APACHE_USER}:${APACHE_USER} report.zip /tmp/${AET_ARTIFACT}
+# RUN wget -O /tmp/${AET_ARTIFACT} ${AET_ARTIFACT_DOWNLOAD_URL} \
+  RUN unzip -o /tmp/${AET_ARTIFACT} -d ${APACHE_WWW_DIR} \
   && rm /tmp/${AET_ARTIFACT}
 
 # Add all extra files
